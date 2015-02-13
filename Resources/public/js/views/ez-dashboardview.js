@@ -20,6 +20,48 @@ YUI.add('ez-dashboardview', function (Y) {
      * @extends eZ.TemplateBasedView
      */
     Y.eZ.DashboardView = Y.Base.create('dashboardView', Y.eZ.TemplateBasedView, [], {
+        events: {
+            '.ez-discover': {
+                'tap': '_runUniversalDiscovery',
+            },
+            '.ez-discover-settings': {
+                'tap': '_runUniversalDiscoverySettings',
+            },
+        },
+
+        _runUniversalDiscovery: function (e) {
+            this.fire('contentDiscover', {
+                config: {
+                    contentDiscoveredHandler: Y.bind(this._universalDiscoveryConfirmHandler, this),
+                }
+            });
+        },
+
+        _runUniversalDiscoverySettings: function (e) {
+            this.fire('contentDiscover', {
+                config: {
+                    title: 'Select your contentS',
+                    multiple: true,
+                    contentDiscoveredHandler: Y.bind(this._universalDiscoveryConfirmHandler, this),
+                    //visibleMethod: 'recent',
+                },
+            });
+        },
+
+        _universalDiscoveryConfirmHandler: function (e) {
+            var selNode = this.get('container').one('.ez-ud-selection'),
+                names = [];
+
+            if ( e.target.get('multiple') ) {
+                Y.Array.each(e.selection, function (struct) {
+                    names.push(struct.content.get('name'));
+                });
+                selNode.setContent(names.join(', '));
+            } else {
+                selNode.setContent(e.selection.content.get('name'));
+            }
+        },
+
         /**
          * Renders the dashboard view
          *

@@ -490,6 +490,11 @@ YUI.add('ez-universaldiscoveryview', function (Y) {
                             priority: 100,
                             multiple: this.get('multiple'),
                         }),
+                        new Y.eZ.UniversalDiscoveryRecentView({
+                            bubbleTargets: this,
+                            priority: 100,
+                            selectionMode: this.get('selectionMode'),
+                        }),
                     ];
                 },
             },
