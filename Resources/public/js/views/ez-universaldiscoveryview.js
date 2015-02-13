@@ -344,6 +344,11 @@ YUI.add('ez-universaldiscoveryview', function (Y) {
                             priority: 100,
                             selectionMode: this.get('selectionMode'),
                         }),
+                        new Y.eZ.UniversalDiscoveryRecentView({
+                            bubbleTargets: this,
+                            priority: 100,
+                            selectionMode: this.get('selectionMode'),
+                        }),
                     ];
                 },
             },

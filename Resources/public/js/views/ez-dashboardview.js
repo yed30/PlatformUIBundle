@@ -20,6 +20,45 @@ YUI.add('ez-dashboardview', function (Y) {
      * @extends eZ.TemplateBasedView
      */
     Y.eZ.DashboardView = Y.Base.create('dashboardView', Y.eZ.TemplateBasedView, [], {
+        events: {
+            '.ez-discover': {
+                'tap': '_runUniversalDiscovery',
+            },
+            '.ez-discover-settings': {
+                'tap': '_runUniversalDiscoverySettings',
+            },
+        },
+
+        _runUniversalDiscovery: function (e) {
+            this.fire('contentDiscover', {
+                config: {
+                    contentDiscoveredHandler: Y.bind(this._universalDiscoveryConfirmHandler, this),
+                }
+            });
+        },
+
+        _runUniversalDiscoverySettings: function (e) {
+            this.fire('contentDiscover', {
+                config: {
+                    title: 'You can not cancel, please click on Confirm',
+                    selectionMode: 'multiple',
+                    contentDiscoveredHandler: Y.bind(this._universalDiscoveryConfirmHandler, this),
+                    cancelDiscoverHandler: Y.bind(this._universalDiscoveryCancelHandler, this),
+                    visibleMethod: 'recent',
+                },
+            });
+        },
+
+        _universalDiscoveryConfirmHandler: function (e) {
+            var countNode = this.get('container').one('.ez-ud-selection');
+
+            countNode.setContent(e.selection.content.get('name'));
+        },
+
+        _universalDiscoveryCancelHandler: function (e) {
+            e.halt(true);
+        },
+
         /**
          * Renders the dashboard view
          *
