@@ -90,18 +90,6 @@ class PlatformUI extends Context
     }
 
     /**
-     * Waits for Javascript to finnish by running a empty Javascript
-     * (In Sahi it's possible to have the same result by running an empty javascript only)
-     */
-    protected function activateJsErrorHandler()
-    {
-        //Needs to be here
-        //$this->execJavascript( '' );
-        $jsCode = "return BDD.errorHandlerActivate();";
-        $this->execJavascript( $jsCode );
-    }
-
-    /**
      * @Given I create a content of content type :type with:
      */
     public function iCreateContentType( $type, TableNode $fields )
@@ -255,8 +243,6 @@ class PlatformUI extends Context
 
     /**
      * Runs a empty Javascript between step so that the next step is only executed when the previous Javascript finnished
-     *
-     * @AfterStep
      */
     public function waitForJs()
     {

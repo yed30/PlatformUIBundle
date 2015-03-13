@@ -23,7 +23,7 @@ trait Authentication
     protected $shouldBeLoggedIn;
 
     /**
-     * @Given I go to homepage
+     * @Given I go to PlatformUI app
      */
     public function goToPlatformUi()
     {
@@ -35,22 +35,50 @@ trait Authentication
      */
     public function goToPlatformUiAndLogIn( $username, $password )
     {
-        // Given I go to PlatformUI app
         $this->goToPlatformUi();
-        //wait fos JS
-        $this->waitForJs();
-        // And I fill in "Username" with "admin"
+        $this->waitForInitialApplicationLoading();
+        $this->waitForApplicationPageLoading();
         $this->fillFieldWithValue( 'Username', $username );
-        //And I fill in "Password" with "publish"
         $this->fillFieldWithValue( 'Password', $password );
-        //And I click on the "Login" button
         $this->iClickAtButton( 'Login' );
-        //wait fos JS
-        $this->waitForJs();
-        //Then I should be logged in
+        $this->waitForApplicationPageLoading();
         $this->iShouldBeLoggedIn();
-        //Catches Js errors
-        $this->activateJsErrorHandler();
+    }
+
+    /**
+     * Waits for the initial application loading. When the app is ready, the app
+     * container gets the class ez-platformui-app-ready
+     */
+    protected function waitForInitialApplicationLoading()
+    {
+        $page = $this->getSession()->getPage();
+
+        while ( !$page->has( 'css', '.ez-platformui-app-ready' ) )
+        {
+            // TODO don't that for ever, throw an exception after some
+            // iterations. Also see http://docs.behat.org/en/v2.5/cookbook/using_spin_functions.html
+            // for a much better way to implement that and
+            // waitForApplicationPageLoading
+            usleep( 100 * 1000 );
+        }
+    }
+
+    /**
+     * Waits for the application "page" to load. The "page" is considered to be
+     * loading when the app container has either the class is-app-loading or
+     * yui3-app-transitioning.
+     *
+     * @AfterStep
+     */
+    public function waitForApplicationPageLoading()
+    {
+        $page = $this->getSession()->getPage();
+
+        while ( $page->has( 'css', '.is-app-loading, .yui3-app-transitioning' ) )
+        {
+            // TODO don't that for ever
+            usleep( 100 * 1000 );
+        }
     }
 
     /**
@@ -77,10 +105,10 @@ trait Authentication
     {
         $this->shouldBeLoggedIn = true;
 
-        $jsCode = "return (document.querySelector('.ez-loginform') === null);";
-
-        $isLoggedIn = $this->evalJavascript( $jsCode, false );
-        Assertion::assertTrue( $isLoggedIn, "Not logged in" );
+        Assertion::assertFalse(
+            $this->getSession()->getPage()->has( 'css', '.ez-loginform' ),
+            "The login form should not be visible"
+        );
     }
 
     /**

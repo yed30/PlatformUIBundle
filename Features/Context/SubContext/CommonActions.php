@@ -20,10 +20,7 @@ trait CommonActions
      */
     public function clickLogo()
     {
-        $selector = '.ez-logo a';
-        $jsArg = JsHelper::generateFuncArgs( $selector );
-        $jsCode = "return BDD.clickElement( $jsArg );";
-        $this->execJavascript( $jsCode );
+        $this->getSession()->getPage()->find( 'css', '.ez-logo a' )->click();
     }
 
     /**
@@ -32,7 +29,9 @@ trait CommonActions
      */
     public function clickTab( $tab )
     {
-        $this->clickElementByText( $tab, ".ez-tabs-label a[href]" );
+        $this->getSession()->getPage()->find(
+            'xpath', '//a[starts-with(@href, "#ez-tabs-") and text()="' . $tab . '"]'
+        )->click();
     }
 
     /**
@@ -41,7 +40,9 @@ trait CommonActions
      */
     public function clickNavigationZone( $zone )
     {
-        $this->clickElementByText( $zone, ".ez-zone-name" );
+        $this->getSession()->getPage()->find(
+            'xpath', '//*[contains(@class, "ez-zone-name") and text()="' . $zone . '"]'
+        )->click();
     }
 
     /**
