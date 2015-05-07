@@ -22,7 +22,7 @@ YUI.add('ez-savedraftplugin', function (Y) {
      */
     Y.eZ.Plugin.SaveDraft = Y.Base.create('saveDraftPlugin', Y.eZ.Plugin.ViewServiceBase, [], {
         initializer: function () {
-            this.onHostEvent('*:saveAction', this._saveDraft);
+            this.onHostEvent('*:saveAction', Y.bind(this._saveDraft, this));
         },
 
         /**
@@ -39,6 +39,14 @@ YUI.add('ez-savedraftplugin', function (Y) {
             if ( !e.formIsValid ) {
                 return;
             }
+
+            this.get('host').fire('notify', {
+                notification: {
+                    identifier: 'save-draft',
+                    text: 'Saving the draft',
+                    state: 'started',
+                },
+            });
             if ( content.isNew() ) {
                 this._createContent(e.fields);
             } else {
@@ -55,6 +63,13 @@ YUI.add('ez-savedraftplugin', function (Y) {
         _saveDraftCallback: function (error, response) {
             // TODO visual feedback + error handling
             // see https://jira.ez.no/browse/EZP-23512
+            this.get('host').fire('notify', {
+                notification: {
+                    identifier: 'save-draft',
+                    text: 'The draft was stored successfully',
+                    state: 'done',
+                },
+            });
         },
 
         /**
@@ -69,8 +84,7 @@ YUI.add('ez-savedraftplugin', function (Y) {
             var service = this.get('host'),
                 capi = service.get('capi'),
                 version = service.get('version'),
-                content = service.get('content'),
-                that = this;
+                content = service.get('content');
 
             content.save({
                 api: capi,
@@ -78,10 +92,10 @@ YUI.add('ez-savedraftplugin', function (Y) {
                 contentType: service.get('contentType'),
                 parentLocation: service.get('parentLocation'),
                 fields: fields,
-            }, function (error, response) {
+            }, Y.bind(function (error, response) {
                 version.setAttrs(version.parse({document: response.document.Content.CurrentVersion}));
-                that._saveDraftCallback(error, response);
-            });
+                this._saveDraftCallback(error, response);
+            }, this));
         },
 
         /**
@@ -103,7 +117,7 @@ YUI.add('ez-savedraftplugin', function (Y) {
                 fields: fields,
                 contentId: content.get('id'),
                 languageCode: service.get('languageCode'),
-            }, this._saveDraftCallback);
+            }, Y.bind(this._saveDraftCallback, this));
         },
     }, {
         NS: 'saveDraft',
