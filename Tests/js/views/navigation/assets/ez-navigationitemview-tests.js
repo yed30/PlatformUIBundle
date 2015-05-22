@@ -16,6 +16,7 @@ YUI.add('ez-navigationitemview-tests', function (Y) {
                 name: "viewLocation",
                 params: {
                     id: 42,
+                    languageCode: 'eng-GB',
                 }
             };
             this.view = new Y.eZ.NavigationItemView({
@@ -112,6 +113,7 @@ YUI.add('ez-navigationitemview-tests', function (Y) {
                 name: this.routeName,
                 params: {
                     id: 42,
+                    languageCode: 'eng-GB',
                 }
             };
             this.view = new Y.eZ.NavigationItemView({

@@ -1004,6 +1004,7 @@ YUI.add('ez-locationviewviewservice-tests', function (Y) {
                 parentLocation = new Mock(),
                 locationId = 'raul-gonzalez-blanco',
                 contentName = 'pierlugi-collina',
+                languageCode = 'eng-GB',
                 notified = false;
 
             this.service.set('path', [{location: parentLocation}]);
@@ -1017,8 +1018,17 @@ YUI.add('ez-locationviewviewservice-tests', function (Y) {
 
             Mock.expect(content, {
                 method: 'get',
-                args: ['name'],
-                returns: contentName,
+                args: [Mock.Value.String],
+                run: function (attr) {
+                    if (attr === "name") {
+                        return contentName;
+                    } else if (attr === "mainLanguageCode") {
+                        return languageCode;
+                    } else {
+                        Y.fail("Unexpected parameter for content mock");
+                    }
+
+                }
             });
 
             Mock.expect(parentLocation, {
@@ -1082,6 +1092,7 @@ YUI.add('ez-locationviewviewservice-tests', function (Y) {
                 that = this,
                 locationId = 'raul-gonzalez-blanco',
                 contentName = 'pierlugi-collina',
+                languageCode = "eng-GB",
                 eventFired = false;
 
             this.service.set('path', [{location: parentLocation}]);
@@ -1095,8 +1106,17 @@ YUI.add('ez-locationviewviewservice-tests', function (Y) {
 
             Mock.expect(content, {
                 method: 'get',
-                args: ['name'],
-                returns: contentName,
+                args: [Mock.Value.String],
+                run: function (attr) {
+                    if (attr === "name") {
+                        return contentName;
+                    } else if (attr === "mainLanguageCode") {
+                        return languageCode;
+                    } else {
+                        Y.fail("Unexpected parameter for content mock");
+                    }
+
+                }
             });
 
             Mock.expect(parentLocation, {

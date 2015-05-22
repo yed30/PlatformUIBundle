@@ -5,7 +5,7 @@
 YUI.add('ez-navigationhubviewservice-tests', function (Y) {
     var getViewParametersTest, logOutEvtTest, defaultNavigationItemsTest,
         addNavigationItemTest, removeNavigationItemTest, navigateToTest,
-        Assert = Y.Assert;
+        Assert = Y.Assert, Mock = Y.Mock;
 
     getViewParametersTest = new Y.Test.Case({
         name: "eZ Navigation Hub View Service getViewParameters test",
@@ -28,9 +28,35 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
                 }
             };
 
+            this.rootStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootStruct.location, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            Mock.expect(this.rootStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.rootMediaStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootMediaStruct.location, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            Mock.expect(this.rootMediaStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
             this.service = new Y.eZ.NavigationHubViewService({
                 app: this.app,
                 request: this.request,
+                rootStruct: this.rootStruct,
+                rootMediaStruct: this.rootMediaStruct,
             });
         },
 
@@ -40,6 +66,8 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
             delete this.user;
             delete this.app;
             delete this.request;
+            delete this.rootStruct;
+            delete this.rootMediaStruct;
         },
 
         "Should return an object containing the application user": function () {
@@ -53,7 +81,7 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         },
 
         _testNavigationItems: function (zone) {
-            var items = [];
+            var items = this.service.get(zone + 'NavigationItems');
 
             this.service._set(zone + 'NavigationItems', items);
 
@@ -133,6 +161,8 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
 
             this.service = new Y.eZ.NavigationHubViewService({
                 app: this.app,
+                rootStruct: {},
+                rootMediaStruct: {},
             });
         },
 
@@ -161,6 +191,8 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
 
             this.service = new Y.eZ.NavigationHubViewService({
                 app: this.app,
+                rootStruct: {},
+                rootMediaStruct: {},
             });
         },
 
@@ -183,7 +215,10 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         name: "eZ Navigation Hub View Service default navigation items",
 
         setUp: function () {
-            this.service = new Y.eZ.NavigationHubViewService();
+            this.service = new Y.eZ.NavigationHubViewService({
+                rootStruct: {},
+                rootMediaStruct: {},
+            });
         },
 
         tearDown: function () {
@@ -192,29 +227,30 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         },
 
         _assertLocationNavigationItem: function (item, title, identifier, locationId) {
-            Assert.areSame(
-                Y.eZ.NavigationItemView, item.Constructor,
-                "The constructor should be eZ.NavigationItemView"
+            Assert.isInstanceOf(
+                Y.eZ.NavigationItemView, item,
+                "Item should be an instance of NavigationItemView"
             );
             Assert.areEqual(
-                title, item.config.title,
+                title, item.get('title'),
                 "The navigation item title does not match"
             );
             Assert.areEqual(
-                identifier, item.config.identifier,
+                identifier, item.get('identifier'),
                 "The navigation item identifier does not match"
             );
             Assert.areEqual(
-                "viewLocation", item.config.route.name,
+                "viewLocation", item.get('route').name,
                 "The navigation item route name does not match"
             );
             Assert.areEqual(
-                locationId, item.config.route.params.id,
+                locationId, item.get('route').params.id,
                 "The navigation item location id does not match"
             );
         },
 
         _assertNavigationItem: function (item, title, identifier, routeName) {
+
             Assert.areSame(
                 Y.eZ.NavigationItemView, item.Constructor,
                 "The constructor should be eZ.NavigationItemView"
@@ -234,18 +270,52 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         },
 
         "'platform' zone": function () {
-            var value = this.service.get('platformNavigationItems');
+            var value;
+
+            this.rootStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns: '/allez/om',
+            });
+
+            Mock.expect(this.rootStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootStruct', this.rootStruct);
+
+
+            this.rootMediaStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootMediaStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns: '/allez/om/media',
+            });
+
+            Mock.expect(this.rootMediaStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootMediaStruct', this.rootMediaStruct);
+
+            value = this.service.get('platformNavigationItems');
 
             Assert.isArray(value, "The platformNavigationItems should contain an array");
             Assert.areEqual(
                 2, value.length,
                 "2 items should be configured by default for the platform zone"
             );
+
             this._assertLocationNavigationItem(
-                value[0], "Content structure", "content-structure", "/api/ezp/v2/content/locations/1/2"
+                value[0], "Content structure", "content-structure", "/allez/om"
             );
             this._assertLocationNavigationItem(
-                value[1], "Media library", "media-library", "/api/ezp/v2/content/locations/1/43"
+                value[1], "Media library", "media-library", "/allez/om/media"
             );
         },
 
@@ -301,7 +371,10 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         name: "eZ Navigation Hub View Service add navigation item tests",
 
         setUp: function () {
-            this.service = new Y.eZ.NavigationHubViewService();
+            this.service = new Y.eZ.NavigationHubViewService({
+                rootStruct: {},
+                rootMediaStruct: {},
+            });
         },
 
         tearDown: function () {
@@ -328,6 +401,37 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         },
 
         "Should add the navigation item to the 'platform' zone": function () {
+            this.rootStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns: '/allez/om',
+            });
+
+            Mock.expect(this.rootStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootStruct', this.rootStruct);
+
+
+            this.rootMediaStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootMediaStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns: '/allez/om/media',
+            });
+
+            Mock.expect(this.rootMediaStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootMediaStruct', this.rootMediaStruct);
+
             this._testAttribute('platform');
         },
 
@@ -348,7 +452,10 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         name: "eZ Navigation Hub View Service remove navigation item test",
 
         setUp: function () {
-            this.service = new Y.eZ.NavigationHubViewService();
+            this.service = new Y.eZ.NavigationHubViewService({
+                rootStruct: {},
+                rootMediaStruct: {},
+            });
             this.platformIdentifier = 'peppa-pig';
             this.studioplusIdentifier = 'ben-et-holly';
             this.studioIdentifier = 'paw-patrol';
@@ -376,6 +483,19 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
             delete this.service;
         },
 
+        _testLocationAttribute: function (zone) {
+            var identifier = this[zone + "Identifier"];
+
+            this.service.removeNavigationItem(identifier, zone);
+
+            Y.Array.each(this.service.get(zone + "NavigationItems"), function (item) {
+                Assert.areNotEqual(
+                    identifier, item.get('identifier'),
+                    identifier + " should have been removed"
+                );
+            });
+        },
+
         _testAttribute: function (zone) {
             var identifier = this[zone + "Identifier"];
 
@@ -390,7 +510,38 @@ YUI.add('ez-navigationhubviewservice-tests', function (Y) {
         },
 
         "Should remove the navigation item to the 'platform' zone": function () {
-            this._testAttribute('platform');
+            this.rootStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns:'/allez/om',
+            });
+
+            Mock.expect(this.rootStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootStruct', this.rootStruct);
+
+
+            this.rootMediaStruct = {'location': new Mock(), 'content': new Mock()};
+
+            Mock.expect(this.rootMediaStruct.location, {
+                method: 'get',
+                args: ['id'],
+                returns:'/allez/om/media',
+            });
+
+            Mock.expect(this.rootMediaStruct.content, {
+                method: 'get',
+                args: [Mock.Value.Any]
+            });
+
+            this.service._set('rootMediaStruct', this.rootMediaStruct);
+
+            this._testLocationAttribute('platform');
         },
 
         "Should remove the navigation item to the 'studioplus' zone": function () {

@@ -195,6 +195,15 @@ YUI.add('ez-locationviewview', function (Y) {
             },
 
             /**
+             * Language code of the current location
+             *
+             * @attribute languageCode
+             * @type String
+             * @writeOnce
+             */
+            languageCode: {},
+
+            /**
              * The action bar instance, by default an instance {{#crossLink
              * "eZ.ActionBarView"}}eZ.ActionBarView{{/crossLink}}
              *
