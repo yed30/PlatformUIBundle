@@ -193,7 +193,6 @@ YUI.add('ez-locationviewview', function (Y) {
                 valueFn: function () {
                     return new Y.eZ.ActionBarView({
                         content: this.get('content'),
-                        contentType: this.get('contentType'),
                     });
                 }
             },
