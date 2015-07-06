@@ -1,0 +1,74 @@
+<h2>Content details</h2>
+<dl class="ez-details-authors ez-asynchronousview">
+    <dt>Creator</dt>
+    <dd>
+    {{#if loadingError}}
+        <p class="ez-asynchronousview-error ez-font-icon">
+            An error occurred while loading the creator.
+            <button class="ez-asynchronousview-retry ez-button ez-font-icon pure-button">
+                Retry
+            </button>
+        </p>
+    {{else}}
+        {{#if contentCreator }}
+            {{contentCreator.name}} - {{content.publishedDate}}
+        {{else}}
+            <p class="ez-font-icon ez-asynchronousview-loading">Loading the creator</p>
+        {{/if}}
+    {{/if}}
+    </dd>
+
+    <dt>Last contributor</dt>
+    <dd>
+    {{#if loadingError}}
+        <p class="ez-asynchronousview-error ez-font-icon">
+            An error occurred while loading the last contributor.
+            <button class="ez-asynchronousview-retry ez-button ez-font-icon pure-button">Retry</button>
+        </p>
+    {{else}}
+        {{#if lastContributor}}
+             {{lastContributor.name}} - {{content.lastModificationDate}}
+        {{else}}
+            <p class="ez-font-icon ez-asynchronousview-loading">Loading the last contributor</p>
+        {{/if}}
+    {{/if}}
+    </dd>
+
+    <dt>Visibility</dt>
+    <dd>
+    {{#if location.hidden}}
+        Hidden
+    {{else}}
+        {{#if location.invisible}}
+            Hidden by superior
+        {{else}}
+            Visible
+        {{/if}}
+    {{/if}}
+    </dd>
+    <dt>Versions</dt>
+    <dd>{{currentVersion.versionNo}}</dd>
+    <dt>Translations</dt>
+    <dd>
+        {{languageCount}}
+        <ul>
+            {{#each translationsList}}
+                <li><a href="{{path "viewLocation" id=../location.id languageCode=.}}">{{.}}</a></li>
+            {{/each}}
+        </ul>
+    </dd>
+</dl>
+
+<h2>Technical details</h2>
+<dl>
+    <dt>Content Id</dt>
+    <dd>{{content.contentId}}</dd>
+    <dt>Location Id</dt>
+    <dd>{{location.locationId}}</dd>
+    <dt>Content remote Id</dt>
+    <dd>{{ content.remoteId}}</dd>
+    <dt>Location remote Id</dt>
+    <dd>{{location.remoteId}}</dd>
+</dl>
+
+
