@@ -35,6 +35,9 @@ YUI.add('ez-contenteditview', function (Y) {
             },
             '.ez-main-content': {
                 'keyup': '_handleKeyboard'
+            },
+            '.ez-change-content-language-link': {
+                'tap': '_changeLanguage',
             }
         },
 
@@ -101,7 +104,8 @@ YUI.add('ez-contenteditview', function (Y) {
                 version: this.get('version').toJSON(),
                 mainLocation: this.get('mainLocation').toJSON(),
                 contentType: this.get('contentType').toJSON(),
-                owner: this.get('owner').toJSON()
+                owner: this.get('owner').toJSON(),
+                languageCode: this.get('languageCode')
             }));
             if ( this._isTouch() ) {
                 container.addClass('is-using-touch-device');
@@ -210,7 +214,25 @@ YUI.add('ez-contenteditview', function (Y) {
          */
         _isTouch: function () {
             return Y.UA.touchEnabled;
-        }
+        },
+
+        /**
+         * Tap event handler on change language button. It fires `changeLanguage` event.
+         *
+         * @method _changeLanguage
+         * @private
+         * @param {EventFacade} e
+         */
+        _changeLanguage: function (e) {
+            e.preventDefault();
+
+            /**
+             * Fired when the change language link was tapped
+             *
+             * @event changeLanguage
+             */
+            this.fire('changeLanguage');
+        },
     }, {
         ATTRS: {
             /**
@@ -313,7 +335,7 @@ YUI.add('ez-contenteditview', function (Y) {
                         version: this.get('version')
                     });
                 }
-            }
+            },
         }
     });
 });

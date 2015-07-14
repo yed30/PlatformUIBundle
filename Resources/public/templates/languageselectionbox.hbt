@@ -2,7 +2,7 @@
 <h2 class="ez-languageselectionbox-title">{{ title }}</h2>
 
 <ul class="ez-languageselectionbox-languages ez-languageselectionbox-newtranslations">
-    {{#each newTranslations}}
+    {{#each languages}}
         <li class="ez-translation ez-new-translation" data-languagecode="{{ this }}">{{ this }}</li>
     {{/each}}
 </ul>
