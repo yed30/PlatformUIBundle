@@ -57,6 +57,9 @@ YUI.add('ez-languageselectionboxview', function (Y) {
                     this.render();
                 }
             });
+            this.on('newTranslationsOnListChange', function (e) {
+                this.render();
+            });
             this.on('canBaseTranslationChange', function (e) {
                 this._uiSetBaseTranslationVisibility(e.newVal);
             });
@@ -240,11 +243,17 @@ YUI.add('ez-languageselectionboxview', function (Y) {
         },
 
         render: function () {
-            var container = this.get('container');
+            var container = this.get('container'),
+                languages;
 
+            if (this.get('newTranslationsOnList')) {
+                languages = this.get('newTranslations');
+            } else {
+                languages = this.get('existingTranslations');
+            }
             container.setHTML(this.template({
                 title: this.get('title'),
-                newTranslations: this.get('newTranslations'),
+                languages: languages,
                 existingTranslations: this.get('existingTranslations'),
                 canBaseTranslation: this.get('canBaseTranslation'),
             }));
@@ -407,6 +416,19 @@ YUI.add('ez-languageselectionboxview', function (Y) {
              */
             selectedBaseLanguageCode: {
                 value: null
+            },
+
+            /**
+             * Defines what the list o translations will contain.
+             * If it is set to TRUE then list of languages will contain not existing (new) translations.
+             * Otherwise list of language will contain already existing translations.
+             *
+             * @attribute baseTranslation
+             * @type {Boolean}
+             * @default false
+             */
+            newTranslationsOnList: {
+                value: false
             }
         },
     });

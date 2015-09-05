@@ -22,6 +22,10 @@ YUI.add('ez-contentcreateviewservice', function (Y) {
      * @extends eZ.ContentEditViewService
      */
     Y.eZ.ContentCreateViewService = Y.Base.create('contentCreateViewService', Y.eZ.ContentEditViewService, [], {
+        initializer: function () {
+            this.on('*:changeLanguage', this._changeLanguage);
+        },
+
         _load: function (next) {
             var type = this.get('contentType'),
                 service = this;
@@ -93,6 +97,48 @@ YUI.add('ez-contentcreateviewservice', function (Y) {
                 });
             });
         },
+
+        /**
+         * changeLanguage event handler. It opens languageSelectionBox for selecting
+         * language of created content
+         *
+         * @method _changeLanguage
+         * @private
+         * @param {EventFacade} e
+         */
+        _changeLanguage: function (e) {
+            var that = this;
+
+            e.preventDefault();
+            this.fire('languageSelect', {
+                config: {
+                    title: "Change language to:",
+                    languageSelectedHandler: Y.bind(this._changeContentLanguage, this),
+                    cancelLanguageSelectionHandler: null,
+                    canBaseTranslation: false,
+                    newTranslationsOnList: true,
+                    existingTranslations: [that.get('languageCode')]
+                },
+            });
+        },
+
+        /**
+         * Changes language od created content to one given in event facade
+         *
+         * @method _changeContentLanguage
+         * @private
+         * @param {EventFacade} e
+         * @param {EventFacade} e.selectedLanguageCode language code to which created ontent will be switched
+         */
+        _changeContentLanguage: function (e) {
+            var version = this.get('version'),
+                service = this;
+
+            version.sync('delete', {api: this.get('capi')}, function () {
+                service.set('languageCode',e.selectedLanguageCode);
+                service.set('version', new Y.eZ.Version());
+            });
+        }
     }, {
         ATTRS: {
             /**
