@@ -41,6 +41,12 @@ trait Override
             throw new \Exception('Field not found');
         }
 
+        // make sure any autofocus elements don't mis-behave when setting value
+        $fieldNode->blur();
+        usleep(10*1000);
+        $fieldNode->focus();
+        usleep(10*1000);
+
         $fieldNode->setValue($value);
         $fieldNode = $this->getSession()->getPage()->findField($field);
         // verication that the field was really filled
