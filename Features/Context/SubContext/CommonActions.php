@@ -98,6 +98,13 @@ trait CommonActions
     public function clickEditActionBar($button)
     {
         $this->clickElementByText($button, '.ez-editactionbar-container .ez-action', '.action-label');
+
+        // wait for the action to complete
+        $maxTime = time() + self::WAIT_TIMEOUT;
+        do {
+            $elem = $this->getSession()->getPage()->find('css', '.ez-notification-text');
+            usleep(self::WAIT_SLEEP_TIME);
+        } while ($elem != null && time() < $maxTime);
     }
 
     /**
