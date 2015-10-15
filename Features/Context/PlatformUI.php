@@ -24,8 +24,8 @@ class PlatformUI extends Context
     /**
      * Constants used for waiting mechanism.
      */
-    const WAIT_TIMEOUT = 60; // seconds
-    const WAIT_SLEEP_TIME = 300000; // 300ms
+    const WAIT_TIMEOUT = 150; // seconds
+    const WAIT_SLEEP_TIME = 500000; // 500ms
 
     use SubContext\Authentication;
     use SubContext\CommonActions;
@@ -44,11 +44,6 @@ class PlatformUI extends Context
      * @var string
      */
     private $platformUiUri;
-
-    /**
-     * Last exception thrown in spin method.
-     */
-    private $lastException;
 
     /**
      * User account name, admin by default.
@@ -79,9 +74,15 @@ class PlatformUI extends Context
      * Behat spin functions
      * causes waiting while a a certain function does not return true
      * waits while an element is not present.
+     *
+     * @param callable $lambda
+     *
+     * @return mixed
+     * @throws \Exception
      */
-    public function spin($lambda)
+    public function spin(callable $lambda)
     {
+        $e = null;
         $timeLimit = time() + self::WAIT_TIMEOUT;
         do {
             try {
@@ -89,15 +90,13 @@ class PlatformUI extends Context
                 if ($return) {
                     return $return;
                 }
-            } catch (\Exception $e) {
-                $this->lastException = $e;
-            }
+            } catch (\Exception $e) {}
             usleep(self::WAIT_SLEEP_TIME);
         } while ($timeLimit > time());
 
         throw new \Exception(
-            'Timeout reached (' . self::WAIT_TIMEOUT . ' seconds). Last exception catched: ' .
-            $this->lastException->getMessage()
+            'Timeout reached (' . self::WAIT_TIMEOUT . ' seconds)' .
+            ($e !== null ? '. Last exception: ' . $e->getMessage() : '')
         );
     }
 
