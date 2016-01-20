@@ -10,9 +10,17 @@
         <source>server</source>
         <target>Server</target>
       </trans-unit>
+      <trans-unit id="2bb22b8c875ccf10e0f0c19eb7503cc6" resname="packages">
+        <source>packages</source>
+        <target>Packages</target>
+      </trans-unit>
       <trans-unit id="27fe419d5eb953490a9fd3132c79aa2e" resname="ez.platform.version">
         <source>ez.platform.version</source>
         <target>You are using eZ Platform version</target>
+      </trans-unit>
+      <trans-unit id="611211b34660182d3f34da6e5c43eb96" resname="kernel.running">
+        <source>kernel.running</source>
+        <target>running on kernel</target>
       </trans-unit>
       <trans-unit id="611211b34660182d3f34da6e5c43eb96" resname="symfony.based">
         <source>symfony.based</source>

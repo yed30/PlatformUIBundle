@@ -8,7 +8,6 @@
  */
 namespace EzSystems\PlatformUIBundle\Helper;
 
-use Symfony\Component\HttpKernel\Kernel;
 use Doctrine\DBAL\Connection;
 use ezcSystemInfo;
 
@@ -30,10 +29,21 @@ class SystemInfoHelper implements SystemInfoHelperInterface
      */
     private $connection;
 
-    public function __construct(Connection $db, array $bundles)
+    /**
+     * @var string
+     */
+    private $installDir;
+
+    /**
+     * @param Connection $db
+     * @param array $bundles
+     * @param string $installDir
+     */
+    public function __construct(Connection $db, array $bundles, $installDir)
     {
         $this->bundles = $bundles;
         $this->connection = $db;
+        $this->installDir = $installDir;
     }
 
     /**
@@ -76,22 +86,49 @@ class SystemInfoHelper implements SystemInfoHelperInterface
     }
 
     /**
-     * Returns informations on the current eZ Platform install:
-     *  - eZ Publish legacy version
-     *  - eZ Publish legacy extensions
-     *  - Symfony bundles.
+     *  Returns sorted list of bundles enabled.
      *
      * @return array
      */
-    public function getEzPlatformInfo()
+    public function getBundles()
     {
-        $info = [
-            'version' => 'dev',
-            'symfony' => Kernel::VERSION,
-            'bundles' => $this->bundles,
-        ];
-        ksort($info['bundles'], SORT_FLAG_CASE | SORT_STRING);
+        $bundles = $this->bundles;
+        ksort($bundles, SORT_FLAG_CASE | SORT_STRING);
 
-        return $info;
+        return $bundles;
+    }
+
+    /**
+     * Returns sorted information about Composer packages.
+     *
+     * Key is package name, and each value consists of:
+     * - version (version number, from package, typically `v6.0.2` or `dev-master`)
+     * - time
+     * - homepage
+     * - reference (checksum, typically reflecting git sha1)
+     *
+     * @return array
+     */
+    public function getPackagesInfo()
+    {
+        if (!file_exists($this->installDir . 'composer.lock')) {
+            return array();
+        }
+
+        $packages = [];
+        $lockData = json_decode(file_get_contents($this->installDir . 'composer.lock'), true);
+        foreach ($lockData['packages'] as $packageData) {
+            $packages[$packageData['name']] = [
+                'version' => $packageData['version'],
+                'time' => $packageData['time'],
+                'homepage' => $packageData['homepage'],
+                'reference' => $packageData['source']['reference'],
+
+            ];
+        }
+
+        ksort($packages, SORT_FLAG_CASE | SORT_STRING);
+
+        return $packages;
     }
 }

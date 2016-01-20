@@ -118,6 +118,7 @@ services:
         arguments:
             - @database_connection
             - %kernel.bundles%
+            - "%kernel.root_dir%/../"
 
     ezsystems.platformui.controller.systeminfo:
         class: %ezsystems.platformui.controller.systeminfo.class%

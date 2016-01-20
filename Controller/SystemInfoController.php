@@ -38,8 +38,9 @@ class SystemInfoController extends Controller
     public function infoAction()
     {
         return $this->render('eZPlatformUIBundle:SystemInfo:info.html.twig', [
-            'ezplatformInfo' => $this->systemInfoHelper->getEzPlatformInfo(),
+            'bundlesInfo' => $this->systemInfoHelper->getBundles(),
             'systemInfo' => $this->systemInfoHelper->getSystemInfo(),
+            'packagesInfo' => $this->systemInfoHelper->getPackagesInfo(),
         ]);
     }
 

@@ -18,9 +18,22 @@ interface SystemInfoHelperInterface
     public function getSystemInfo();
 
     /**
-     * Returns information about eZ Publish Platform itself.
+     * Returns sorted list of bundles enabled.
      *
      * @return array
      */
-    public function getEzPlatformInfo();
+    public function getBundles();
+
+    /**
+     * Returns sorted information about Composer packages.
+     *
+     * Key is package name, and each value consists of:
+     * - version (version number, from package, typically `v6.0.2` or `dev-master`)
+     * - time
+     * - homepage
+     * - reference (checksum, typically reflecting git sha1)
+     *
+     * @return array
+     */
+    public function getPackagesInfo();
 }
